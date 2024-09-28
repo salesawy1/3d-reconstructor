@@ -1,100 +1,103 @@
 import React, { useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'; // Add useLoader here
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'; // Ensure useLoader is imported
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OrbitControls, PointerLockControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Component to load and display the OBJ model
 function Model({ path }) {
-  const obj = useLoader(OBJLoader, path);
-  return <primitive object={obj} scale={[0.5, 0.5, 0.5]} />;
+    const materials = useLoader(MTLLoader, path.replace('.obj', '.mtl'));
+    const obj = useLoader(OBJLoader, path, (loader) => {
+        loader.setMaterials(materials);
+    });
+
+    return <primitive object={obj} />;
 }
 
 // Custom component to handle WASD movement and mouse control
 function Controls() {
-  const { camera } = useThree();
-  const moveSpeed = 0.1;
-  const [moveForward, setMoveForward] = useState(false);
-  const [moveBackward, setMoveBackward] = useState(false);
-  const [moveLeft, setMoveLeft] = useState(false);
-  const [moveRight, setMoveRight] = useState(false);
-  const velocity = new THREE.Vector3();
-  const direction = new THREE.Vector3();
+    const { camera } = useThree();
+    const moveSpeed = 0.1;
+    const [moveForward, setMoveForward] = useState(false);
+    const [moveBackward, setMoveBackward] = useState(false);
+    const [moveLeft, setMoveLeft] = useState(false);
+    const [moveRight, setMoveRight] = useState(false);
+    const velocity = new THREE.Vector3();
+    const direction = new THREE.Vector3();
 
-  const handleKeyDown = (event) => {
-    switch (event.code) {
-      case 'KeyW':
-        setMoveForward(true);
-        break;
-      case 'KeyS':
-        setMoveBackward(true);
-        break;
-      case 'KeyA':
-        setMoveLeft(true);
-        break;
-      case 'KeyD':
-        setMoveRight(true);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleKeyUp = (event) => {
-    switch (event.code) {
-      case 'KeyW':
-        setMoveForward(false);
-        break;
-      case 'KeyS':
-        setMoveBackward(false);
-        break;
-      case 'KeyA':
-        setMoveLeft(false);
-        break;
-      case 'KeyD':
-        setMoveRight(false);
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
+    const handleKeyDown = (event) => {
+        switch (event.code) {
+            case 'KeyW':
+                setMoveForward(true);
+                break;
+            case 'KeyS':
+                setMoveBackward(true);
+                break;
+            case 'KeyA':
+                setMoveLeft(true);
+                break;
+            case 'KeyD':
+                setMoveRight(true);
+                break;
+            default:
+                break;
+        }
     };
-  }, []);
 
-  useFrame(() => {
-    direction.z = Number(moveForward) - Number(moveBackward);
-    direction.x = Number(moveRight) - Number(moveLeft);
-    direction.normalize();
+    const handleKeyUp = (event) => {
+        switch (event.code) {
+            case 'KeyW':
+                setMoveForward(false);
+                break;
+            case 'KeyS':
+                setMoveBackward(false);
+                break;
+            case 'KeyA':
+                setMoveLeft(false);
+                break;
+            case 'KeyD':
+                setMoveRight(false);
+                break;
+            default:
+                break;
+        }
+    };
 
-    if (moveForward || moveBackward) {
-      velocity.z -= direction.z * moveSpeed;
-    }
-    if (moveLeft || moveRight) {
-      velocity.x -= direction.x * moveSpeed;
-    }
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
 
-    camera.position.add(velocity);
-  });
+    useFrame(() => {
+        direction.z = Number(moveForward) - Number(moveBackward);
+        direction.x = Number(moveRight) - Number(moveLeft);
+        direction.normalize();
 
-  return <PointerLockControls />;
+        // Apply movement only if there is direction input
+        if (direction.length() > 0) {
+            velocity.z -= direction.z * moveSpeed;
+            velocity.x -= direction.x * moveSpeed;
+            camera.position.add(velocity);
+        }
+    });
+
+    return <PointerLockControls />;
 }
 
 // Main 3D rendering component
 export default function ThreeDRender({ modelPath }) {
-  return (
-    <Canvas>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <Model path={modelPath} />
-      <Controls />
-      <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-    </Canvas>
-  );
+    return (
+        <Canvas style={{ width: '100vw', height: '100vh', margin: 0, overflow: 'hidden' }}>
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 10, 10]} />
+            <directionalLight position={[-5, 5, 5]} intensity={1} />
+            <Model path={modelPath} />
+            <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+        </Canvas>
+    );
 }
