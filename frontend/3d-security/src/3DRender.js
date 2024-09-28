@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'; // Ensure useLoader is imported
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'; 
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OrbitControls, PointerLockControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Component to load and display the OBJ model
 function Model({ path }) {
-    const materials = useLoader(MTLLoader, path.replace('.obj', '.mtl'));
-    const obj = useLoader(OBJLoader, path, (loader) => {
-        loader.setMaterials(materials);
-    });
+    const obj = useLoader(OBJLoader, path); // Load only the OBJ file
 
     return <primitive object={obj} />;
 }
@@ -98,6 +94,7 @@ export default function ThreeDRender({ modelPath }) {
             <directionalLight position={[-5, 5, 5]} intensity={1} />
             <Model path={modelPath} />
             <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+            <Controls /> {/* Include the Controls component */}
         </Canvas>
     );
 }

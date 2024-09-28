@@ -7,8 +7,8 @@ import CamerasView from './CamerasView';
 function App() {
   return (
     <div className="App">
-      <CamerasView />
-      {/* <ThreeDRender modelPath="/apple.obj" /> */}
+      {/* <CamerasView /> */}
+      <ThreeDRender modelPath="/mesh.obj" />
     </div>
   );
 }
