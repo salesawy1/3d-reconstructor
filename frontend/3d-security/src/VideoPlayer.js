@@ -43,12 +43,11 @@ const VideoPlayer = ({ videoSrc, currentTime, onTimeUpdate, isPlaying, setDurati
     }, [isPlaying]);
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '10px' }}>
+        <div style={{ textAlign: 'center', marginInline: 2 }}>
             <video
                 ref={videoRef}
                 width="100%"
                 height="auto"
-                controls
                 style={{ borderRadius: '10px' }}
                 onTimeUpdate={handleTimeUpdate}
             >

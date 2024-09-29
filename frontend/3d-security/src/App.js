@@ -11,10 +11,7 @@ function App() {
     <div className="App">
       {view === '3d' ? <ThreeDRender />
       :
-      <CamerasView />}  
-      <button onClick={() => setView(view === '3d' ? 'camera' : '3d')}>
-        Switch
-      </button>
+      <CamerasView view={view} setView={setView}/>}  
     </div>
   );
 }
