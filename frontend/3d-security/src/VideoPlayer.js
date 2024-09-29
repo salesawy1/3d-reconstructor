@@ -43,7 +43,7 @@ const VideoPlayer = ({ videoSrc, currentTime, onTimeUpdate, isPlaying, setDurati
     }, [isPlaying]);
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <video
                 ref={videoRef}
                 width="100%"

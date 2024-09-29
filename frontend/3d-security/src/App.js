@@ -5,10 +5,16 @@ import VideoPlayer from './VideoPlayer';
 import CamerasView from './CamerasView';
 
 function App() {
+  const [view, setView] = React.useState('camera');
+
   return (
     <div className="App">
-      {/* <CamerasView /> */}
-      <ThreeDRender modelPath="/mesh.obj" />
+      {view === '3d' ? <ThreeDRender />
+      :
+      <CamerasView />}  
+      <button onClick={() => setView(view === '3d' ? 'camera' : '3d')}>
+        Switch
+      </button>
     </div>
   );
 }

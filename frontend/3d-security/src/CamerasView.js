@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import VideoPlayer from './VideoPlayer';
+import './App.css';
 
 const CamerasView = () => {
     const [currentTime, setCurrentTime] = useState(0);
@@ -73,27 +74,51 @@ const CamerasView = () => {
             </div>
 
             {/* Video players */}
-            <div style={{ 
-                display: 'flex', 
-                flexDirection: 'row', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                gap: '20px' 
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center',
+                columnGap: '10px',
+                rowGap: '-10px'
             }}>
-                <VideoPlayer 
-                    videoSrc="/adhav.MOV" 
-                    currentTime={currentTime} 
-                    onTimeUpdate={handleTimeUpdate} 
-                    isPlaying={isPlaying} 
-                    setDuration={setDuration}
-                />
-                <VideoPlayer 
-                    videoSrc="/adhav.MOV" 
-                    currentTime={currentTime} 
-                    onTimeUpdate={handleTimeUpdate} 
-                    isPlaying={isPlaying} 
-                    setDuration={setDuration}
-                />
+                <div className='video-player'>
+                    <VideoPlayer
+                        videoSrc="/adhav.MOV"
+                        currentTime={currentTime}
+                        onTimeUpdate={handleTimeUpdate}
+                        isPlaying={isPlaying}
+                        setDuration={setDuration}
+                    />
+                </div>
+                <div className='video-player'>
+                    <VideoPlayer
+                        videoSrc="/adhav.MOV"
+                        currentTime={currentTime}
+                        onTimeUpdate={handleTimeUpdate}
+                        isPlaying={isPlaying}
+                        setDuration={setDuration}
+                    />
+                </div>
+                <div className='video-player'>
+                    <VideoPlayer
+                        videoSrc="/adhav.MOV"
+                        currentTime={currentTime}
+                        onTimeUpdate={handleTimeUpdate}
+                        isPlaying={isPlaying}
+                        setDuration={setDuration}
+                    />
+                </div>
+                <div className='video-player'>
+                    <VideoPlayer
+                        videoSrc="/adhav.MOV"
+                        currentTime={currentTime}
+                        onTimeUpdate={handleTimeUpdate}
+                        isPlaying={isPlaying}
+                        setDuration={setDuration}
+                    />
+                </div>
             </div>
         </div>
     );
