@@ -4,13 +4,13 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { PointerLockControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Component to load and display the GLB model
 function Model({ path }) {
-    const { scene } = useLoader(GLTFLoader, path); // Load the GLB file
+    const { scene } = useLoader(GLTFLoader, path);
 
     useEffect(() => {
+        console.log(`Loaded model from path: ${path}`);
+
         return () => {
-            // Dispose of the model resources when unmounted
             scene.traverse((child) => {
                 if (child.isMesh) {
                     child.geometry.dispose();
@@ -20,71 +20,48 @@ function Model({ path }) {
                 }
             });
         };
-    }, [scene]);
+    }, [scene, path]);
 
-    // Scale the model
-    const scale = 10; // Adjust the scale factor as needed
+    const scale = 10;
     return <primitive object={scene} scale={[scale, scale, scale]} />;
 }
 
-function Controls({ moveForward, setMoveForward, moveBackward, setMoveBackward, moveLeft, setMoveLeft, moveRight, setMoveRight, moveUp, setMoveUp, moveDown, setMoveDown, moveSpeed }) {
+function Controls({ moveSpeed, modelIndex, setModelIndex, totalModels }) {
     const { camera } = useThree();
+    const [moveForward, setMoveForward] = useState(false);
+    const [moveBackward, setMoveBackward] = useState(false);
+    const [moveLeft, setMoveLeft] = useState(false);
+    const [moveRight, setMoveRight] = useState(false);
+    const [moveUp, setMoveUp] = useState(false);
+    const [moveDown, setMoveDown] = useState(false);
 
     const onKeyDown = (event) => {
         switch (event.code) {
-            case 'KeyW':
-            case 'ArrowUp':
-                setMoveForward(true);
+            case 'KeyW': setMoveForward(true); break;
+            case 'KeyS': setMoveBackward(true); break;
+            case 'KeyA': setMoveLeft(true); break;
+            case 'KeyD': setMoveRight(true); break;
+            case 'KeyQ': setMoveUp(true); break;
+            case 'KeyE': setMoveDown(true); break;
+            case 'ArrowLeft': 
+                setModelIndex((prevIndex) => (prevIndex - 1 + totalModels) % totalModels);
                 break;
-            case 'KeyS':
-            case 'ArrowDown':
-                setMoveBackward(true);
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                setMoveRight(true);
-                break;
-            case 'KeyD':
             case 'ArrowRight':
-                setMoveLeft(true);
+                setModelIndex((prevIndex) => (prevIndex + 1) % totalModels);
                 break;
-            case 'KeyQ':
-                setMoveUp(true);
-                break;
-            case 'KeyE':
-                setMoveDown(true);
-                break;
-            default:
-                break;
+            default: break;
         }
     };
 
     const onKeyUp = (event) => {
         switch (event.code) {
-            case 'KeyW':
-            case 'ArrowUp':
-                setMoveForward(false);
-                break;
-            case 'KeyS':
-            case 'ArrowDown':
-                setMoveBackward(false);
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                setMoveRight(false);
-                break;
-            case 'KeyD':
-            case 'ArrowRight':
-                setMoveLeft(false);
-                break;
-            case 'KeyQ':
-                setMoveUp(false);
-                break;
-            case 'KeyE':
-                setMoveDown(false);
-                break;
-            default:
-                break;
+            case 'KeyW': setMoveForward(false); break;
+            case 'KeyS': setMoveBackward(false); break;
+            case 'KeyA': setMoveLeft(false); break;
+            case 'KeyD': setMoveRight(false); break;
+            case 'KeyQ': setMoveUp(false); break;
+            case 'KeyE': setMoveDown(false); break;
+            default: break;
         }
     };
 
@@ -101,7 +78,7 @@ function Controls({ moveForward, setMoveForward, moveBackward, setMoveBackward, 
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
         const right = new THREE.Vector3();
-        const up = new THREE.Vector3(0, 1, 0); // Up direction
+        const up = new THREE.Vector3(0, 1, 0);
 
         camera.getWorldDirection(direction);
         direction.y = 0;
@@ -111,10 +88,10 @@ function Controls({ moveForward, setMoveForward, moveBackward, setMoveBackward, 
 
         if (moveForward) velocity.add(direction.clone().multiplyScalar(moveSpeed));
         if (moveBackward) velocity.add(direction.clone().multiplyScalar(-moveSpeed));
-        if (moveLeft) velocity.add(right.clone().multiplyScalar(-moveSpeed));
-        if (moveRight) velocity.add(right.clone().multiplyScalar(moveSpeed));
-        if (moveUp) velocity.add(up.clone().multiplyScalar(moveSpeed));
-        if (moveDown) velocity.add(up.clone().multiplyScalar(-moveSpeed));
+        if (moveRight) velocity.add(right.clone().multiplyScalar(-moveSpeed));
+        if (moveLeft) velocity.add(right.clone().multiplyScalar(moveSpeed));
+        if (moveDown) velocity.add(up.clone().multiplyScalar(moveSpeed));
+        if (moveUp) velocity.add(up.clone().multiplyScalar(-moveSpeed));
 
         camera.position.add(velocity);
     });
@@ -122,84 +99,66 @@ function Controls({ moveForward, setMoveForward, moveBackward, setMoveBackward, 
     return <PointerLockControls />;
 }
 
-export default function ThreeDRender({ currentTime }) {
-    const [modelIndex, setModelIndex] = useState(0); // Index for the model
-    const [modelPath, setModelPath] = useState(`/mesh${modelIndex}.glb`); // Change file extension to .glb
-    const [moveForward, setMoveForward] = useState(false);
-    const [moveBackward, setMoveBackward] = useState(false);
-    const [moveLeft, setMoveLeft] = useState(false);
-    const [moveRight, setMoveRight] = useState(false);
-    const [moveUp, setMoveUp] = useState(false);
-    const [moveDown, setMoveDown] = useState(false);
-    const [moveSpeed, setMoveSpeed] = useState(0.01); // Initial movement speed
-
-    const totalModels = 5; // Total number of models available
-
-    const handleNext = () => {
-        setModelIndex((prevIndex) => (prevIndex + 1) % totalModels);
-    };
-
-    const handlePrevious = () => {
-        setModelIndex((prevIndex) => (prevIndex - 1 + totalModels) % totalModels);
-    };
+export default function ThreeDRender() {
+    const [modelIndex, setModelIndex] = useState(0);
+    const [modelPath, setModelPath] = useState(`/models/batch_${modelIndex}.glb`);
+    const [moveSpeed] = useState(0.01);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadedModels, setLoadedModels] = useState([]);
+    const totalModels = 10;
 
     useEffect(() => {
-        setModelPath(`/models/batch_${modelIndex}.glb`); // Update model path based on index
+        console.log(`Model path updated: /models/batch_${modelIndex}.glb`);
+        setModelPath(`/models/batch_${modelIndex}.glb`);
     }, [modelIndex]);
 
+    useEffect(() => {
+        const preloadModels = async () => {
+            const promises = [];
+            for (let i = 0; i < totalModels; i++) {
+                console.log(`Preloading model ${i}`);
+                promises.push(new Promise((resolve) => {
+                    const loader = new GLTFLoader();
+                    loader.load(`/models/batch_${i}.glb`, (gltf) => {
+                        setLoadedModels((prev) => [...prev, gltf]);
+                        resolve();
+                    });
+                }));
+            }
+            await Promise.all(promises);
+            setIsLoading(false);
+        };
+        
+        preloadModels();
+    }, [totalModels]);
+
     return (
-        <div className='' style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-            <div
-                style={{
-                    position: 'absolute',
-                    bottom: '20px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1,
-                }}
-            >
-                <button onClick={handlePrevious} style={{ marginRight: '10px' }}>
-                    Previous
-                </button>
-                <button onClick={handleNext} style={{ marginRight: '10px' }}>
-                    Next
-                </button>
-                <label style={{ marginLeft: '10px' }}>Movement Speed: </label>
-                <input
-                    type="range"
-                    min="0.005"
-                    max="0.1"
-                    step="0.001"
-                    value={moveSpeed}
-                    onChange={(e) => setMoveSpeed(parseFloat(e.target.value))}
-                    style={{ marginLeft: '10px' }}
-                />
-            </div>
-            <Canvas style={{ width: '100%', height: '100%', margin: 0 }}>
-                <ambientLight intensity={1.0} /> {/* Increase ambient light intensity */}
-                <pointLight position={[0, 5, 0]} intensity={1.0} distance={10} decay={2} />
-                <directionalLight position={[-5, 5, 5]} intensity={3} />
-                <directionalLight position={[5, 5, 5]} intensity={3} />
-                <directionalLight position={[5, -5, 5]} intensity={3} />
-                <directionalLight position={[-5, -5, 5]} intensity={3} />
-                <directionalLight position={[5, 5, -5]} intensity={3} />
-                <directionalLight position={[-5, 5, -5]} intensity={3} />
-                <directionalLight position={[5, -5, -5]} intensity={3} />
-                <directionalLight position={[-5, -5, -5]} intensity={3} />
-                <Model path={modelPath} />
-                <Controls 
-                    moveForward={moveForward} setMoveForward={setMoveForward}
-                    moveBackward={moveBackward} setMoveBackward={setMoveBackward}
-                    moveLeft={moveLeft} setMoveLeft={setMoveLeft}
-                    moveRight={moveRight} setMoveRight={setMoveRight}
-                    moveUp={moveUp} setMoveUp={setMoveUp}
-                    moveDown={moveDown} setMoveDown={setMoveDown}
-                    moveSpeed={moveSpeed} // Pass moveSpeed to Controls
-                />
-            </Canvas>
+        <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+            {isLoading ? (
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '24px', color: '#fff' }}>
+                    Loading models...
+                </div>
+            ) : (
+                <Canvas style={{ width: '100%', height: '100%', margin: 0 }}>
+                    <ambientLight intensity={1.0} />
+                    <pointLight position={[0, 5, 0]} intensity={1.0} distance={10} decay={2} />
+                    <directionalLight position={[-5, 5, 5]} intensity={3} />
+                    <directionalLight position={[5, 5, 5]} intensity={3} />
+                    <directionalLight position={[5, -5, 5]} intensity={3} />
+                    <directionalLight position={[-5, -5, 5]} intensity={3} />
+                    <directionalLight position={[5, 5, -5]} intensity={3} />
+                    <directionalLight position={[-5, 5, -5]} intensity={3} />
+                    <directionalLight position={[5, -5, -5]} intensity={3} />
+                    <directionalLight position={[-5, -5, -5]} intensity={3} />
+                    <Model path={modelPath} />
+                    <Controls
+                        moveSpeed={moveSpeed}
+                        modelIndex={modelIndex}
+                        setModelIndex={setModelIndex}
+                        totalModels={totalModels}
+                    />
+                </Canvas>
+            )}
         </div>
     );
 }
