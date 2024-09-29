@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import VideoPlayer from './VideoPlayer';
 import './App.css';
 
-const CamerasView = ({view, setView}) => {
-    const [currentTime, setCurrentTime] = useState(0);
+const CamerasView = ({view, setView, currentTime, setCurrentTime}) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [frameRate, setFrameRate] = useState(30); // default frame rate of 30 fps
     const [duration, setDuration] = useState(0); // stores video duration for the slider
     const intervalRef = useRef(null);
 
-    const [videoSrcs, setVideoSrcs] = useState(['/adhav.MOV', '/adhav.MOV', '/adhav.MOV', '/adhav.MOV',  '/nathan.MOV', '/saif.MOV'])
+    const [videoSrcs, setVideoSrcs] = useState(['/patrick-computer.mp4',  '/saif_ipad.mp4', '/nathan_phone.mp4', '/saif_phone.mp4', '/nathan_computer.mp4'])
 
     // Update the video time based on the frame rate
     useEffect(() => {
@@ -58,7 +57,7 @@ const CamerasView = ({view, setView}) => {
             }}>
                 <div>
                     <h1 style={{ textAlign: 'left' }}>2D CAMERA VIEW</h1>
-                    <h2 style={{ textAlign: 'left' }}><em>{Date(currentTime)}</em></h2>
+                    <h2 style={{ textAlign: 'left' }}><em>{Date()}</em></h2>
                 </div>
                 <button style={{
                     fontSize: '1.5rem', 
@@ -76,7 +75,7 @@ const CamerasView = ({view, setView}) => {
                     width: '60%',
                 }}>
                     <VideoPlayer
-                        videoSrc={'/adhav.MOV'}
+                        videoSrc={'/patrick-phone.mp4'}
                         currentTime={currentTime}
                         onTimeUpdate={handleTimeUpdate}
                         isPlaying={isPlaying}

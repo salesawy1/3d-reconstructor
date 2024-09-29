@@ -6,12 +6,17 @@ import CamerasView from './CamerasView';
 
 function App() {
   const [view, setView] = React.useState('camera');
+  const [currentTime, setCurrentTime] = React.useState(0);
 
   return (
     <div className="App">
-      {view === '3d' ? <ThreeDRender />
+      {view === '3d' ? <ThreeDRender currentTime={currentTime} />
       :
-      <CamerasView view={view} setView={setView}/>}  
+      <CamerasView 
+        view={view} 
+        setView={setView}
+        currentTime={currentTime}
+        setCurrentTime={setCurrentTime}/>}  
     </div>
   );
 }

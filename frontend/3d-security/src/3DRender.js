@@ -122,7 +122,7 @@ function Controls({ moveForward, setMoveForward, moveBackward, setMoveBackward, 
     return <PointerLockControls />;
 }
 
-export default function ThreeDRender() {
+export default function ThreeDRender({ currentTime }) {
     const [modelIndex, setModelIndex] = useState(0); // Index for the model
     const [modelPath, setModelPath] = useState(`/mesh${modelIndex}.glb`); // Change file extension to .glb
     const [moveForward, setMoveForward] = useState(false);
@@ -131,7 +131,7 @@ export default function ThreeDRender() {
     const [moveRight, setMoveRight] = useState(false);
     const [moveUp, setMoveUp] = useState(false);
     const [moveDown, setMoveDown] = useState(false);
-    const [moveSpeed, setMoveSpeed] = useState(0.001); // Initial movement speed
+    const [moveSpeed, setMoveSpeed] = useState(0.01); // Initial movement speed
 
     const totalModels = 5; // Total number of models available
 
@@ -144,7 +144,7 @@ export default function ThreeDRender() {
     };
 
     useEffect(() => {
-        setModelPath(`/mesh${modelIndex}.glb`); // Update model path based on index
+        setModelPath(`/models/batch_${modelIndex}.glb`); // Update model path based on index
     }, [modelIndex]);
 
     return (
@@ -170,9 +170,9 @@ export default function ThreeDRender() {
                 <label style={{ marginLeft: '10px' }}>Movement Speed: </label>
                 <input
                     type="range"
-                    min="0.0001"
-                    max="0.005"
-                    step="0.0001"
+                    min="0.005"
+                    max="0.1"
+                    step="0.001"
                     value={moveSpeed}
                     onChange={(e) => setMoveSpeed(parseFloat(e.target.value))}
                     style={{ marginLeft: '10px' }}

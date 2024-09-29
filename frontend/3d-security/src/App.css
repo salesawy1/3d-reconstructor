@@ -4,7 +4,7 @@
   background-color: rgb(27, 29, 33);
   color: white;
   font-family: "Chakra Petch", sans-serif;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .App-logo {
