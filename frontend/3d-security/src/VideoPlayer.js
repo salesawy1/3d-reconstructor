@@ -1,61 +1,45 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, forwardRef } from 'react';
 
-const VideoPlayer = ({ videoSrc, currentTime, onTimeUpdate, isPlaying, setDuration }) => {
-    const videoRef = useRef(null);
+const VideoPlayer = forwardRef(
+  ({ videoSrc, currentTime, isPlaying, onTimeUpdate, setDuration }, ref) => {
+    useEffect(() => {
+      if (ref && ref.current) {
+        ref.current.currentTime = currentTime;
+      }
+    }, [currentTime, ref]);
 
-    const handleTimeUpdate = () => {
-        if (videoRef.current) {
-            const currentVideoTime = videoRef.current.currentTime;
-
-            // Only update time if the difference is significant
-            if (Math.abs(currentVideoTime - currentTime) > 0.1) {
-                onTimeUpdate(currentVideoTime);
-            }
+    useEffect(() => {
+      if (ref && ref.current) {
+        if (isPlaying) {
+          ref.current.play();
+        } else {
+          ref.current.pause();
         }
+      }
+    }, [isPlaying, ref]);
+
+    const handleLoadedMetadata = () => {
+      if (setDuration) {
+        setDuration(ref.current.duration);
+      }
     };
 
-    useEffect(() => {
-        // Set the video duration in the parent component
-        if (videoRef.current) {
-            setDuration(videoRef.current.duration);
-        }
-    }, [videoRef.current?.duration, setDuration]);
-
-    // Synchronize the current time smoothly if needed
-    useEffect(() => {
-        if (videoRef.current) {
-            const currentVideoTime = videoRef.current.currentTime;
-            if (Math.abs(currentVideoTime - currentTime) > 0.1) {
-                videoRef.current.currentTime = currentTime; // Sync only if time drift is significant
-            }
-        }
-    }, [currentTime]);
-
-    // Synchronize play/pause state across players
-    useEffect(() => {
-        if (videoRef.current) {
-            if (isPlaying && videoRef.current.paused) {
-                videoRef.current.play();
-            } else if (!isPlaying && !videoRef.current.paused) {
-                videoRef.current.pause();
-            }
-        }
-    }, [isPlaying]);
+    const handleTimeUpdate = () => {
+      if (onTimeUpdate && ref.current) {
+        onTimeUpdate(ref.current.currentTime);
+      }
+    };
 
     return (
-        <div style={{ textAlign: 'center', marginInline: 2 }}>
-            <video
-                ref={videoRef}
-                width="100%"
-                height="auto"
-                style={{ borderRadius: '10px' }}
-                onTimeUpdate={handleTimeUpdate}
-            >
-                <source src={videoSrc} type="video/mp4" />
-                Your browser does not support the video tag.
-            </video>
-        </div>
+      <video
+        ref={ref}
+        src={videoSrc}
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
+        style={{ width: '100%' }}
+      />
     );
-};
+  }
+);
 
 export default VideoPlayer;

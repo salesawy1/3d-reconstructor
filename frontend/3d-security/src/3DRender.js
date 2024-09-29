@@ -107,6 +107,8 @@ export default function ThreeDRender() {
     const [loadedModels, setLoadedModels] = useState([]);
     const totalModels = 10;
 
+    console.log(`Model path updated: /models/batch_${modelIndex}.glb`);
+
     useEffect(() => {
         console.log(`Model path updated: /models/batch_${modelIndex}.glb`);
         setModelPath(`/models/batch_${modelIndex}.glb`);
